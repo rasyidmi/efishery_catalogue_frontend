@@ -5,7 +5,7 @@ TextButtonThemeData _textButtonTheme = TextButtonThemeData(
     backgroundColor: MaterialStateProperty.resolveWith<Color>(
       (states) {
         if (states.contains(MaterialState.disabled)) {
-          return Colors.grey;
+          return const Color.fromARGB(255, 226, 226, 226);
         }
         return const Color(0xFF349f85);
       },

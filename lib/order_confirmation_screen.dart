@@ -1,7 +1,10 @@
+import 'package:efishery_catalogue_frontend/helper/currency_formatter.dart';
 import 'package:efishery_catalogue_frontend/order_success_screen.dart';
+import 'package:efishery_catalogue_frontend/providers/product_provider.dart';
 import 'package:efishery_catalogue_frontend/widgets/product_card.dart';
 import 'package:efishery_catalogue_frontend/widgets/warning_banner.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class OrderConfirmationScreen extends StatefulWidget {
   const OrderConfirmationScreen({super.key});
@@ -12,22 +15,10 @@ class OrderConfirmationScreen extends StatefulWidget {
 }
 
 class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
-  List<dynamic> orderProducts = [
-    {
-      "name": "Fish",
-      "price": 40000,
-      "orderQuantity": 2,
-      "description": "Min. & maks. pemesanan 2- 10 kg",
-    },
-    {
-      "name": "Shark",
-      "price": 300000,
-      "orderQuantity": 3,
-      "description": "Min. & maks. pemesanan 2- 10 kg",
-    },
-  ];
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<ProductProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -57,16 +48,25 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             const SizedBox(height: 16),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: orderProducts.length,
+              itemCount: productProvider.orderProductList.length,
               itemBuilder: (context, index) {
                 return ProductCard(
-                  name: orderProducts[index]["name"],
-                  price: orderProducts[index]["price"],
-                  orderQuantity: orderProducts[index]["orderQuantity"],
-                  description: orderProducts[index]["description"],
-                  isStockAvailable: true,
-                  onTapMinus: () {},
-                  onTapPlus: () {},
+                  name: productProvider.orderProductList[index].name,
+                  price: productProvider.orderProductList[index].price,
+                  orderQuantity:
+                      productProvider.orderProductList[index].orderQuantity,
+                  description:
+                      productProvider.orderProductList[index].description,
+                  isStockAvailable:
+                      productProvider.orderProductList[index].isAvailable,
+                  onTapMinus: () {
+                    productProvider.reduceOrderQuantity(
+                        productProvider.orderProductList[index].productId);
+                  },
+                  onTapPlus: () {
+                    productProvider.addOrderQuantity(
+                        productProvider.orderProductList[index].productId);
+                  },
                 );
               },
             ),
@@ -75,7 +75,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                   color: Colors.grey[350],
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
+                  borderRadius: const BorderRadius.all(Radius.circular(8))),
               child: Row(
                 children: [
                   const Column(
@@ -99,9 +99,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                   Flexible(
                     child: TextButton(
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const OrderSuccessScreen(),
-                        ));
+                        Navigator.of(context).pop();
                       },
                       style: Theme.of(context).textButtonTheme.style!,
                       child: const Text(
@@ -116,23 +114,25 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
               ),
             ),
             const Spacer(),
-            const Row(
+            Row(
               children: [
-                Text("Estimasi Total Harga Pesanan:"),
-                Spacer(),
+                const Text("Estimasi Total Harga Pesanan:"),
+                const Spacer(),
                 Text(
-                  "Rp280.000",
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  CurrencyFormatter.convertToIdr(productProvider.totalPrice, 0),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 )
               ],
             ),
             const SizedBox(height: 16),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const OrderSuccessScreen(),
-                ));
-              },
+              onPressed: productProvider.cartQuantity > 0
+                  ? () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const OrderSuccessScreen(),
+                      ));
+                    }
+                  : null,
               style: Theme.of(context).textButtonTheme.style!,
               child: const Text(
                 "Lanjut Pemesanan",
