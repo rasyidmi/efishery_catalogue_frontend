@@ -14,4 +14,13 @@ class Product {
     required this.orderQuantity,
     required this.price,
   });
+
+  factory Product.fromJson(Map<String, dynamic> json) => Product(
+        productId: json["si3"],
+        name: json["s4"],
+        description: json["s5"],
+        isAvailable: true,
+        orderQuantity: 0,
+        price: int.parse(json["s3"].replaceAll(",", "")),
+      );
 }

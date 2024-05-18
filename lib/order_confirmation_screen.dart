@@ -6,15 +6,13 @@ import 'package:efishery_catalogue_frontend/widgets/warning_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class OrderConfirmationScreen extends StatefulWidget {
-  const OrderConfirmationScreen({super.key});
+class OrderConfirmationScreen extends StatelessWidget {
+  final String sender;
+  const OrderConfirmationScreen({
+    super.key,
+    required this.sender,
+  });
 
-  @override
-  State<OrderConfirmationScreen> createState() =>
-      _OrderConfirmationScreenState();
-}
-
-class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
@@ -129,7 +127,8 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
               onPressed: productProvider.cartQuantity > 0
                   ? () {
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const OrderSuccessScreen(),
+                        builder: (context) =>
+                            OrderSuccessScreen(sender: sender),
                       ));
                     }
                   : null,
